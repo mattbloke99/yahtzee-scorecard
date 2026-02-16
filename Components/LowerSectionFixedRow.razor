@@ -1,0 +1,25 @@
+<MudTr>
+    <MudTd>@CategoryName (@Points points)</MudTd>
+    <MudTd>
+        <MudCheckBox T="bool?" @bind-Value="CurrentValue" Color="Color.Primary" />
+    </MudTd>
+</MudTr>
+
+@code {
+    [Parameter] public string CategoryName { get; set; } = string.Empty;
+    [Parameter] public int Points { get; set; }
+    [Parameter] public bool? IsChecked { get; set; }
+    [Parameter] public EventCallback<bool?> OnCheckedChanged { get; set; }
+
+    private bool? CurrentValue
+    {
+        get => IsChecked;
+        set
+        {
+            if (IsChecked != value)
+            {
+                OnCheckedChanged.InvokeAsync(value);
+            }
+        }
+    }
+}

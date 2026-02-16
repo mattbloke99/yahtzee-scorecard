@@ -1,0 +1,252 @@
+@using Yahtzee.Models
+@using Yahtzee.Services
+@inject ScoreService ScoreService
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudSimpleTable Dense="true" Hover="true" Bordered="true">
+        <thead>
+            <tr>
+                <th>Category</th>
+                @foreach (var player in Players)
+                {
+                    <th style="text-align: center;">@player.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Upper Section -->
+            @foreach (var category in new[] { "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes" })
+            {
+                <MudTr>
+                    <MudTd>@category</MudTd>
+                    @foreach (var player in Players)
+                    {
+                        <MudTd>
+                            <MudSelect T="int?" Value="GetUpperValue(player.Scores, category)"
+                                      ValueChanged="@(v => { SetUpperValue(player.Scores, category, v); OnScoreChanged.InvokeAsync(); })"
+                                      Label="" Variant="Variant.Outlined" Margin="Margin.Dense" Style="max-width: 80px;">
+                                <MudSelectItem T="int?" Value="null">-</MudSelectItem>
+                                @foreach (var val in ScoreService.GetPossibleValues(category))
+                                {
+                                    <MudSelectItem T="int?" Value="val">@val</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudTd>
+                    }
+                </MudTr>
+            }
+
+            <!-- Upper Subtotal -->
+            <MudTr>
+                <MudTd><strong>Upper Subtotal</strong></MudTd>
+                @foreach (var player in Players)
+                {
+                    <MudTd style="text-align: center;"><strong>@player.Scores.UpperTotal</strong></MudTd>
+                }
+            </MudTr>
+
+            <!-- Upper Bonus -->
+            <MudTr Class="@(Players.Any(p => p.Scores.UpperBonus > 0) ? "bonus-row" : "")">
+                <MudTd>
+                    Bonus (63+ = 35)
+                </MudTd>
+                @foreach (var player in Players)
+                {
+                    <MudTd style="text-align: center;" Class="@(player.Scores.UpperBonus > 0 ? "bonus-achieved" : "")">
+                        <strong>@player.Scores.UpperBonus</strong>
+                        @if (player.Scores.UpperBonus == 0)
+                        {
+                            <br />
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">(@player.Scores.UpperTotal/63)</MudText>
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Color="Color.Success" Size="Size.Small" />
+                        }
+                    </MudTd>
+                }
+            </MudTr>
+
+            <!-- Upper Total -->
+            <MudTr>
+                <MudTd><strong>Upper Total</strong></MudTd>
+                @foreach (var player in Players)
+                {
+                    <MudTd style="text-align: center;"><strong>@(player.Scores.UpperTotal + player.Scores.UpperBonus)</strong></MudTd>
+                }
+            </MudTr>
+
+            <!-- Divider -->
+            <MudTr>
+                <MudTd Colspan="@(Players.Count + 1)">
+                    <MudDivider />
+                </MudTd>
+            </MudTr>
+
+            <!-- Lower Section - Variable -->
+            @foreach (var (category, property) in new[] { ("3 of a Kind", "ThreeOfKind"), ("4 of a Kind", "FourOfKind"), ("Chance", "Chance") })
+            {
+                <MudTr>
+                    <MudTd>@category</MudTd>
+                    @foreach (var player in Players)
+                    {
+                        <MudTd>
+                            <MudNumericField T="int?" Value="GetLowerVariable(player.Scores, property)"
+                                           ValueChanged="@(v => { SetLowerVariable(player.Scores, property, v); OnScoreChanged.InvokeAsync(); })"
+                                           Label="" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                           Min="0" Max="30" Style="max-width: 80px;" />
+                        </MudTd>
+                    }
+                </MudTr>
+            }
+
+            <!-- Lower Section - Fixed -->
+            @foreach (var (category, property, points) in new[] { ("Full House", "FullHouse", 25), ("Small Straight", "SmallStraight", 30), ("Large Straight", "LargeStraight", 40), ("Yahtzee", "Yahtzee", 50) })
+            {
+                <MudTr>
+                    <MudTd>@category (@points points)</MudTd>
+                    @foreach (var player in Players)
+                    {
+                        <MudTd>
+                            <MudCheckBox T="bool?" Value="GetLowerFixed(player.Scores, property)"
+                                       ValueChanged="@(v => { SetLowerFixed(player.Scores, property, v); OnScoreChanged.InvokeAsync(); })"
+                                       Color="Color.Primary" Style="margin: 0;" />
+                        </MudTd>
+                    }
+                </MudTr>
+            }
+
+            <!-- Yahtzee Bonuses -->
+            <MudTr>
+                <MudTd>Yahtzee Bonuses (100 each)</MudTd>
+                @foreach (var player in Players)
+                {
+                    <MudTd>
+                        <MudStack Spacing="1">
+                            @for (int i = 0; i < 6; i++)
+                            {
+                                var index = i;
+                                <MudCheckBox T="bool" Value="GetBonusValue(player.Scores, index)"
+                                           ValueChanged="@((bool val) => { SetBonusValue(player.Scores, index, val); OnScoreChanged.InvokeAsync(); })"
+                                           Color="Color.Success" Dense="true" Label="@((index + 1).ToString())" />
+                            }
+                            <MudText Typo="Typo.caption">Total: @(player.Scores.YahtzeeBonuses.Count(b => b) * 100)</MudText>
+                        </MudStack>
+                    </MudTd>
+                }
+            </MudTr>
+
+            <!-- Lower Total -->
+            <MudTr>
+                <MudTd><strong>Lower Total</strong></MudTd>
+                @foreach (var player in Players)
+                {
+                    <MudTd style="text-align: center;"><strong>@player.Scores.LowerTotal</strong></MudTd>
+                }
+            </MudTr>
+
+            <!-- Divider -->
+            <MudTr>
+                <MudTd Colspan="@(Players.Count + 1)">
+                    <MudDivider />
+                </MudTd>
+            </MudTr>
+
+            <!-- Grand Total -->
+            <MudTr Class="grand-total">
+                <MudTd><strong>GRAND TOTAL</strong></MudTd>
+                @foreach (var player in Players)
+                {
+                    <MudTd style="text-align: center;"><strong>@player.Scores.GrandTotal</strong></MudTd>
+                }
+            </MudTr>
+        </tbody>
+    </MudSimpleTable>
+</MudPaper>
+
+@code {
+    [Parameter] public List<Player> Players { get; set; } = new();
+    [Parameter] public EventCallback OnScoreChanged { get; set; }
+
+    private int? GetUpperValue(YahtzeeScore score, string category) => category switch
+    {
+        "Ones" => score.Ones,
+        "Twos" => score.Twos,
+        "Threes" => score.Threes,
+        "Fours" => score.Fours,
+        "Fives" => score.Fives,
+        "Sixes" => score.Sixes,
+        _ => null
+    };
+
+    private void SetUpperValue(YahtzeeScore score, string category, int? value)
+    {
+        switch (category)
+        {
+            case "Ones": score.Ones = value; break;
+            case "Twos": score.Twos = value; break;
+            case "Threes": score.Threes = value; break;
+            case "Fours": score.Fours = value; break;
+            case "Fives": score.Fives = value; break;
+            case "Sixes": score.Sixes = value; break;
+        }
+    }
+
+    private int? GetLowerVariable(YahtzeeScore score, string property) => property switch
+    {
+        "ThreeOfKind" => score.ThreeOfKind,
+        "FourOfKind" => score.FourOfKind,
+        "Chance" => score.Chance,
+        _ => null
+    };
+
+    private void SetLowerVariable(YahtzeeScore score, string property, int? value)
+    {
+        switch (property)
+        {
+            case "ThreeOfKind": score.ThreeOfKind = value; break;
+            case "FourOfKind": score.FourOfKind = value; break;
+            case "Chance": score.Chance = value; break;
+        }
+    }
+
+    private bool? GetLowerFixed(YahtzeeScore score, string property) => property switch
+    {
+        "FullHouse" => score.FullHouse,
+        "SmallStraight" => score.SmallStraight,
+        "LargeStraight" => score.LargeStraight,
+        "Yahtzee" => score.Yahtzee,
+        _ => null
+    };
+
+    private void SetLowerFixed(YahtzeeScore score, string property, bool? value)
+    {
+        switch (property)
+        {
+            case "FullHouse": score.FullHouse = value; break;
+            case "SmallStraight": score.SmallStraight = value; break;
+            case "LargeStraight": score.LargeStraight = value; break;
+            case "Yahtzee": score.Yahtzee = value; break;
+        }
+    }
+
+    private bool GetBonusValue(YahtzeeScore score, int index)
+    {
+        return index < score.YahtzeeBonuses.Count && score.YahtzeeBonuses[index];
+    }
+
+    private void SetBonusValue(YahtzeeScore score, int index, bool value)
+    {
+        while (score.YahtzeeBonuses.Count <= index)
+        {
+            score.YahtzeeBonuses.Add(false);
+        }
+
+        score.YahtzeeBonuses[index] = value;
+
+        while (score.YahtzeeBonuses.Count > 0 && !score.YahtzeeBonuses[^1])
+        {
+            score.YahtzeeBonuses.RemoveAt(score.YahtzeeBonuses.Count - 1);
+        }
+    }
+}

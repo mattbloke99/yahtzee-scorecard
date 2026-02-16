@@ -1,0 +1,46 @@
+<MudTr>
+    <MudTd>Yahtzee Bonuses (100 each)</MudTd>
+    <MudTd>
+        <MudStack Row="true" Spacing="1">
+            @for (int i = 0; i < 12; i++)
+            {
+                var index = i;
+                <MudCheckBox T="bool" Value="GetBonusValue(index)"
+                            ValueChanged="@((bool val) => SetBonusValue(index, val))"
+                            Color="Color.Success" Dense="true" />
+            }
+        </MudStack>
+        <MudText Typo="Typo.caption">Count: @BonusCount | Total: @BonusTotal</MudText>
+    </MudTd>
+</MudTr>
+
+@code {
+    [Parameter] public List<bool> Bonuses { get; set; } = new();
+    [Parameter] public EventCallback<List<bool>> OnBonusesChanged { get; set; }
+
+    private int BonusCount => Bonuses.Count(b => b);
+    private int BonusTotal => BonusCount * 100;
+
+    private bool GetBonusValue(int index)
+    {
+        return index < Bonuses.Count && Bonuses[index];
+    }
+
+    private void SetBonusValue(int index, bool value)
+    {
+        while (Bonuses.Count <= index)
+        {
+            Bonuses.Add(false);
+        }
+
+        Bonuses[index] = value;
+
+        // Trim trailing false values
+        while (Bonuses.Count > 0 && !Bonuses[^1])
+        {
+            Bonuses.RemoveAt(Bonuses.Count - 1);
+        }
+
+        OnBonusesChanged.InvokeAsync(Bonuses);
+    }
+}

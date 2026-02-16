@@ -1,0 +1,36 @@
+@using Yahtzee.Services
+
+<MudTr>
+    <MudTd>@CategoryName</MudTd>
+    <MudTd>
+        <MudSelect T="int?" @bind-Value="CurrentValue" Label="" Variant="Variant.Outlined"
+                   Margin="Margin.Dense" Style="max-width: 80px;">
+            <MudSelectItem T="int?" Value="null">-</MudSelectItem>
+            @foreach (var val in PossibleValues)
+            {
+                <MudSelectItem T="int?" Value="val">@val</MudSelectItem>
+            }
+        </MudSelect>
+    </MudTd>
+</MudTr>
+
+@code {
+    [Parameter] public string CategoryName { get; set; } = string.Empty;
+    [Parameter] public int? Value { get; set; }
+    [Parameter] public EventCallback<int?> OnValueChanged { get; set; }
+    [Inject] private ScoreService ScoreService { get; set; } = default!;
+
+    private List<int> PossibleValues => ScoreService.GetPossibleValues(CategoryName);
+
+    private int? CurrentValue
+    {
+        get => Value;
+        set
+        {
+            if (Value != value)
+            {
+                OnValueChanged.InvokeAsync(value);
+            }
+        }
+    }
+}

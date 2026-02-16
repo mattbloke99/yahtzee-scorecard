@@ -1,0 +1,103 @@
+@page "/"
+@using Yahtzee.Models
+
+<PageTitle>Yahtzee Score Tracker</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+    @if (!_gameStarted)
+    {
+        <MudPaper Elevation="2" Class="pa-6" Style="max-width: 500px; margin: 0 auto;">
+            <MudText Typo="Typo.h4" Class="mb-4">Yahtzee Score Tracker</MudText>
+
+            <MudNumericField Value="_numPlayers" ValueChanged="OnNumPlayersChanged"
+                            Label="Number of Players" Variant="Variant.Outlined"
+                            Min="1" Max="8" T="int" Class="mb-3" />
+
+            @for (int i = 0; i < _playerNames.Count; i++)
+            {
+                var index = i;
+                <MudTextField @bind-Value="_playerNames[index]" Label="@($"Player {index + 1} Name")"
+                             Variant="Variant.Outlined" Class="mb-2" />
+            }
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="StartGame" FullWidth="true" Class="mt-3">
+                Start Game
+            </MudButton>
+        </MudPaper>
+    }
+    else
+    {
+        <MudStack Row="true" Spacing="2" Class="mb-3">
+            <MudButton Variant="Variant.Outlined" Color="Color.Warning" OnClick="ClearAll" Size="Size.Small">
+                Clear All Scores
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="NewGame" Size="Size.Small">
+                New Game
+            </MudButton>
+        </MudStack>
+
+        <MultiPlayerScoreCard Players="_players" OnScoreChanged="StateHasChanged" />
+    }
+</MudContainer>
+
+@code {
+    private bool _gameStarted;
+    private int _numPlayers = 2;
+    private List<string> _playerNames = new();
+    private List<Player> _players = new();
+
+    protected override void OnInitialized()
+    {
+        UpdatePlayerNames();
+    }
+
+    private void OnNumPlayersChanged(int value)
+    {
+        _numPlayers = value;
+        UpdatePlayerNames();
+    }
+
+    private void UpdatePlayerNames()
+    {
+        while (_playerNames.Count < _numPlayers)
+        {
+            _playerNames.Add($"Player {_playerNames.Count + 1}");
+        }
+        while (_playerNames.Count > _numPlayers)
+        {
+            _playerNames.RemoveAt(_playerNames.Count - 1);
+        }
+    }
+
+    private void StartGame()
+    {
+        UpdatePlayerNames();
+        _players.Clear();
+
+        for (int i = 0; i < _numPlayers; i++)
+        {
+            _players.Add(new Player
+            {
+                Name = string.IsNullOrWhiteSpace(_playerNames[i]) ? $"Player {i + 1}" : _playerNames[i]
+            });
+        }
+
+        _gameStarted = true;
+    }
+
+    private void ClearAll()
+    {
+        foreach (var player in _players)
+        {
+            player.Scores = new YahtzeeScore();
+        }
+    }
+
+    private void NewGame()
+    {
+        _gameStarted = false;
+        _players.Clear();
+        _numPlayers = 2;
+        UpdatePlayerNames();
+    }
+}

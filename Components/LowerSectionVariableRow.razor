@@ -1,0 +1,25 @@
+<MudTr>
+    <MudTd>@CategoryName</MudTd>
+    <MudTd>
+        <MudNumericField T="int?" @bind-Value="CurrentValue" Label="" Variant="Variant.Outlined"
+                        Margin="Margin.Dense" Min="0" Max="30" Style="max-width: 80px;" />
+    </MudTd>
+</MudTr>
+
+@code {
+    [Parameter] public string CategoryName { get; set; } = string.Empty;
+    [Parameter] public int? Value { get; set; }
+    [Parameter] public EventCallback<int?> OnValueChanged { get; set; }
+
+    private int? CurrentValue
+    {
+        get => Value;
+        set
+        {
+            if (Value != value)
+            {
+                OnValueChanged.InvokeAsync(value);
+            }
+        }
+    }
+}

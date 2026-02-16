@@ -1,0 +1,110 @@
+@using Yahtzee.Models
+
+<MudPaper Elevation="2" Class="pa-4">
+    <MudSimpleTable Dense="true" Hover="true" Bordered="true">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Upper Section -->
+            <UpperSectionRow CategoryName="Ones" Value="Score.Ones"
+                           OnValueChanged="@(v => { Score.Ones = v; OnScoreChanged.InvokeAsync(); })" />
+            <UpperSectionRow CategoryName="Twos" Value="Score.Twos"
+                           OnValueChanged="@(v => { Score.Twos = v; OnScoreChanged.InvokeAsync(); })" />
+            <UpperSectionRow CategoryName="Threes" Value="Score.Threes"
+                           OnValueChanged="@(v => { Score.Threes = v; OnScoreChanged.InvokeAsync(); })" />
+            <UpperSectionRow CategoryName="Fours" Value="Score.Fours"
+                           OnValueChanged="@(v => { Score.Fours = v; OnScoreChanged.InvokeAsync(); })" />
+            <UpperSectionRow CategoryName="Fives" Value="Score.Fives"
+                           OnValueChanged="@(v => { Score.Fives = v; OnScoreChanged.InvokeAsync(); })" />
+            <UpperSectionRow CategoryName="Sixes" Value="Score.Sixes"
+                           OnValueChanged="@(v => { Score.Sixes = v; OnScoreChanged.InvokeAsync(); })" />
+
+            <!-- Upper Subtotal -->
+            <MudTr>
+                <MudTd><strong>Upper Subtotal</strong></MudTd>
+                <MudTd><strong>@Score.UpperTotal</strong></MudTd>
+            </MudTr>
+
+            <!-- Upper Bonus -->
+            <MudTr Class="@(Score.UpperBonus > 0 ? "bonus-achieved" : "")">
+                <MudTd>
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                        <span>Bonus (63+ = 35)</span>
+                        @if (Score.UpperBonus > 0)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Color="Color.Success" Size="Size.Small" />
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">(@Score.UpperTotal/63)</MudText>
+                        }
+                    </MudStack>
+                </MudTd>
+                <MudTd><strong>@Score.UpperBonus</strong></MudTd>
+            </MudTr>
+
+            <!-- Upper Total -->
+            <MudTr>
+                <MudTd><strong>Upper Total</strong></MudTd>
+                <MudTd><strong>@(Score.UpperTotal + Score.UpperBonus)</strong></MudTd>
+            </MudTr>
+
+            <!-- Divider -->
+            <MudTr>
+                <MudTd Colspan="2">
+                    <MudDivider />
+                </MudTd>
+            </MudTr>
+
+            <!-- Lower Section - Variable -->
+            <LowerSectionVariableRow CategoryName="3 of a Kind" Value="Score.ThreeOfKind"
+                                   OnValueChanged="@(v => { Score.ThreeOfKind = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionVariableRow CategoryName="4 of a Kind" Value="Score.FourOfKind"
+                                   OnValueChanged="@(v => { Score.FourOfKind = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionVariableRow CategoryName="Chance" Value="Score.Chance"
+                                   OnValueChanged="@(v => { Score.Chance = v; OnScoreChanged.InvokeAsync(); })" />
+
+            <!-- Lower Section - Fixed -->
+            <LowerSectionFixedRow CategoryName="Full House" Points="25" IsChecked="Score.FullHouse"
+                                OnCheckedChanged="@(v => { Score.FullHouse = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionFixedRow CategoryName="Small Straight" Points="30" IsChecked="Score.SmallStraight"
+                                OnCheckedChanged="@(v => { Score.SmallStraight = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionFixedRow CategoryName="Large Straight" Points="40" IsChecked="Score.LargeStraight"
+                                OnCheckedChanged="@(v => { Score.LargeStraight = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionFixedRow CategoryName="Yahtzee" Points="50" IsChecked="Score.Yahtzee"
+                                OnCheckedChanged="@(v => { Score.Yahtzee = v; OnScoreChanged.InvokeAsync(); })" />
+
+            <!-- Yahtzee Bonuses -->
+            <YahtzeeBonusRow Bonuses="Score.YahtzeeBonuses"
+                           OnBonusesChanged="@(v => { Score.YahtzeeBonuses = v; OnScoreChanged.InvokeAsync(); })" />
+
+            <!-- Lower Total -->
+            <MudTr>
+                <MudTd><strong>Lower Total</strong></MudTd>
+                <MudTd><strong>@Score.LowerTotal</strong></MudTd>
+            </MudTr>
+
+            <!-- Divider -->
+            <MudTr>
+                <MudTd Colspan="2">
+                    <MudDivider />
+                </MudTd>
+            </MudTr>
+
+            <!-- Grand Total -->
+            <MudTr Class="grand-total">
+                <MudTd><strong>GRAND TOTAL</strong></MudTd>
+                <MudTd><strong>@Score.GrandTotal</strong></MudTd>
+            </MudTr>
+        </tbody>
+    </MudSimpleTable>
+</MudPaper>
+
+@code {
+    [Parameter] public YahtzeeScore Score { get; set; } = new();
+    [Parameter] public EventCallback OnScoreChanged { get; set; }
+}
