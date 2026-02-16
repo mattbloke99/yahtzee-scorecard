@@ -3,7 +3,14 @@
 
 <PageTitle>Yahtzee Score Tracker</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+<!-- Banner -->
+<MudPaper Elevation="3" Class="mb-4" Style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 2rem;">
+    <MudText Typo="Typo.h3" Align="Align.Center" Style="color: white; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+        🎲 Yahtzee Score Tracker 🎲
+    </MudText>
+</MudPaper>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4">
     @if (!_gameStarted)
     {
         <MudPaper Elevation="2" Class="pa-6" Style="max-width: 500px; margin: 0 auto;">

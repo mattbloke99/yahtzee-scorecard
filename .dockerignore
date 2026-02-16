@@ -1,0 +1,38 @@
+# Build artifacts - reduce build context size
+**/bin/
+**/obj/
+**/BenchmarkDotNet.Artifacts/
+**/TestResults/
+
+# IDE folders - not needed for build
+**/.vs/
+**/.idea/
+**/.vscode/
+**/.NCrunch_RetirementNow/
+**/.run/
+
+# Version control
+# .git/ - COMMENTED OUT: needed for cache-busting with git commit hash
+.gitignore
+.gitattributes
+
+# Documentation and agent files - not needed in container
+*.md
+!README.md
+docs/
+.agent/
+.claude/
+
+# Test projects - not included in production build anyway
+**/*.Tests/
+
+# User-specific files
+**.sln.DotSettings.user
+**.ncrunchsolution
+**.ncrunchsolution.user
+
+# Other unnecessary files
+images/
+Pages/
+*.xlsx
+*.DotSettings
