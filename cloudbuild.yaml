@@ -1,13 +1,11 @@
-﻿steps:
+steps:
   - name: 'gcr.io/kaniko-project/executor:latest'
     args:
-      - '--destination=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_REPO_NAME/$_SERVICE_NAME:latest'
-      - '--destination=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_REPO_NAME/$_SERVICE_NAME:$SHORT_SHA'
+      - '--destination=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/yahtzee-scorecard/$_SERVICE_NAME:latest'
+      - '--destination=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/yahtzee-scorecard/$_SERVICE_NAME:$SHORT_SHA'
       - '--cache=true'
       - '--cache-ttl=168h'
-      - '--cache-repo=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_REPO_NAME/$_SERVICE_NAME/cache'
-      - '--build-arg=BLAZOR_ENVIRONMENT=$_BLAZOR_ENVIRONMENT'
-      - '--build-arg=BUILD_ID=$BUILD_ID'
+      - '--cache-repo=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/yahtzee-scorecard/$_SERVICE_NAME/cache'
       - '--context=dir:///workspace'
       - '--dockerfile=Dockerfile'
     id: Build
@@ -19,28 +17,24 @@
       - $_SERVICE_NAME
       - '--platform=managed'
       - >-
-        --image=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/$_REPO_NAME/$_SERVICE_NAME:latest
+        --image=$_AR_HOSTNAME/$PROJECT_ID/$_AR_REPOSITORY/yahtzee-scorecard/$_SERVICE_NAME:latest
       - >-
         --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$REVISION_ID,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
-      - '--set-env-vars=ENVIRONMENT=$_BLAZOR_ENVIRONMENT'
     id: Deploy
     entrypoint: gcloud
 # Kaniko pushes images directly, no need for images section
 options:
   substitutionOption: ALLOW_LOOSE
   logging: CLOUD_LOGGING_ONLY
-  #logging: LEGACY
 substitutions:
   _AR_HOSTNAME: europe-west1-docker.pkg.dev
   _AR_REPOSITORY: cloud-run-source-deploy
-  _REPO_NAME: retirementnow
-  _SERVICE_NAME: unknown
-  _TRIGGER_ID: e07f40cb-1514-4ec6-97bc-742dfa7ab369
+  _SERVICE_NAME: yahtzee-scorecard
   _DEPLOY_REGION: europe-west1
-  _BLAZOR_ENVIRONMENT: unknown
+  _GCP_REGION: europe-west1
 tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
-  - retirementnow-development
+  - yahtzee-scorecard

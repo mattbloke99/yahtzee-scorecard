@@ -16,7 +16,15 @@ RUN dotnet restore "Yahtzee.csproj"
 
 # Copy everything else and build
 COPY . .
-RUN dotnet publish "Yahtzee.csproj" -c Release -o /app/publish
+RUN dotnet publish "Yahtzee.csproj" -c Release -o /app/publish \
+    -p:BlazorEnableCompression=true \
+    -p:RunAOTCompilation=false
+
+# Remove unnecessary files to reduce size
+RUN cd /app/publish/wwwroot && \
+    find . -name "*.gz" -delete && \
+    find . -name "*.map" -delete && \
+    find . -name "*.pdb" -delete
 
 # Runtime stage
 FROM nginx:alpine
@@ -25,7 +33,13 @@ WORKDIR /usr/share/nginx/html
 # Copy published app
 COPY --from=build /app/publish/wwwroot .
 
-# Copy nginx config
+# Copy nginx config and startup script
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
-EXPOSE 80
+# Cloud Run provides PORT env variable
+ENV PORT=8080
+EXPOSE 8080
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
