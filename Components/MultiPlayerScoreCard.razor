@@ -22,10 +22,10 @@
             </MudTr>
 
             <!-- Upper Section -->
-            @foreach (var category in new[] { "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes" })
+            @foreach (var (category, icon) in new[] { ("Ones", "⚀"), ("Twos", "⚁"), ("Threes", "⚂"), ("Fours", "⚃"), ("Fives", "⚄"), ("Sixes", "⚅") })
             {
                 <MudTr>
-                    <MudTd>@category</MudTd>
+                    <MudTd Style="font-size: 2.8rem; line-height: 1;">@icon</MudTd>
                     @foreach (var player in Players)
                     {
                         <MudTd>
@@ -118,13 +118,17 @@
             @foreach (var (category, property, points) in new[] { ("Full House", "FullHouse", 25), ("Small Straight", "SmallStraight", 30), ("Large Straight", "LargeStraight", 40), ("Yahtzee", "Yahtzee", 50) })
             {
                 <MudTr>
-                    <MudTd>@category (@points points)</MudTd>
+                    <MudTd>@category</MudTd>
                     @foreach (var player in Players)
                     {
                         <MudTd>
-                            <MudCheckBox T="bool?" Value="GetLowerFixed(player.Scores, property)"
-                                       ValueChanged="@(v => { SetLowerFixed(player.Scores, property, v); OnScoreChanged.InvokeAsync(); })"
-                                       Color="Color.Primary" Style="margin: 0;" />
+                            <MudSelect T="int?" Value="GetLowerFixed(player.Scores, property)"
+                                      ValueChanged="@(v => { SetLowerFixed(player.Scores, property, v); OnScoreChanged.InvokeAsync(); })"
+                                      Label="" Variant="Variant.Outlined" Margin="Margin.Dense" Style="max-width: 80px;">
+                                <MudSelectItem T="int?" Value="null">-</MudSelectItem>
+                                <MudSelectItem T="int?" Value="0">0</MudSelectItem>
+                                <MudSelectItem T="int?" Value="points">@points</MudSelectItem>
+                            </MudSelect>
                         </MudTd>
                     }
                 </MudTr>
@@ -132,20 +136,20 @@
 
             <!-- Yahtzee Bonuses -->
             <MudTr>
-                <MudTd>Yahtzee Bonuses (100 each)</MudTd>
+                <MudTd>Yahtzee Bonuses<br />(100 each)</MudTd>
                 @foreach (var player in Players)
                 {
                     <MudTd>
-                        <MudStack Spacing="1">
-                            @for (int i = 0; i < 6; i++)
+                        <MudStack Row="true" Spacing="0">
+                            @for (int i = 0; i < 4; i++)
                             {
                                 var index = i;
                                 <MudCheckBox T="bool" Value="GetBonusValue(player.Scores, index)"
                                            ValueChanged="@((bool val) => { SetBonusValue(player.Scores, index, val); OnScoreChanged.InvokeAsync(); })"
-                                           Color="Color.Success" Dense="true" Label="@((index + 1).ToString())" />
+                                           Color="Color.Default" Dense="true" />
                             }
-                            <MudText Typo="Typo.caption">Total: @(player.Scores.YahtzeeBonuses.Count(b => b) * 100)</MudText>
                         </MudStack>
+                        <MudText Typo="Typo.caption">Total: @(player.Scores.YahtzeeBonuses.Count(b => b) * 100)</MudText>
                     </MudTd>
                 }
             </MudTr>
@@ -224,7 +228,7 @@
         }
     }
 
-    private bool? GetLowerFixed(YahtzeeScore score, string property) => property switch
+    private int? GetLowerFixed(YahtzeeScore score, string property) => property switch
     {
         "FullHouse" => score.FullHouse,
         "SmallStraight" => score.SmallStraight,
@@ -233,7 +237,7 @@
         _ => null
     };
 
-    private void SetLowerFixed(YahtzeeScore score, string property, bool? value)
+    private void SetLowerFixed(YahtzeeScore score, string property, int? value)
     {
         switch (property)
         {

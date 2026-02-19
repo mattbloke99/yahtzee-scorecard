@@ -69,14 +69,14 @@
                                    OnValueChanged="@(v => { Score.Chance = v; OnScoreChanged.InvokeAsync(); })" />
 
             <!-- Lower Section - Fixed -->
-            <LowerSectionFixedRow CategoryName="Full House" Points="25" IsChecked="Score.FullHouse"
-                                OnCheckedChanged="@(v => { Score.FullHouse = v; OnScoreChanged.InvokeAsync(); })" />
-            <LowerSectionFixedRow CategoryName="Small Straight" Points="30" IsChecked="Score.SmallStraight"
-                                OnCheckedChanged="@(v => { Score.SmallStraight = v; OnScoreChanged.InvokeAsync(); })" />
-            <LowerSectionFixedRow CategoryName="Large Straight" Points="40" IsChecked="Score.LargeStraight"
-                                OnCheckedChanged="@(v => { Score.LargeStraight = v; OnScoreChanged.InvokeAsync(); })" />
-            <LowerSectionFixedRow CategoryName="Yahtzee" Points="50" IsChecked="Score.Yahtzee"
-                                OnCheckedChanged="@(v => { Score.Yahtzee = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionFixedRow CategoryName="Full House" Points="25" Value="Score.FullHouse"
+                                OnValueChanged="@(v => { Score.FullHouse = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionFixedRow CategoryName="Small Straight" Points="30" Value="Score.SmallStraight"
+                                OnValueChanged="@(v => { Score.SmallStraight = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionFixedRow CategoryName="Large Straight" Points="40" Value="Score.LargeStraight"
+                                OnValueChanged="@(v => { Score.LargeStraight = v; OnScoreChanged.InvokeAsync(); })" />
+            <LowerSectionFixedRow CategoryName="Yahtzee" Points="50" Value="Score.Yahtzee"
+                                OnValueChanged="@(v => { Score.Yahtzee = v; OnScoreChanged.InvokeAsync(); })" />
 
             <!-- Yahtzee Bonuses -->
             <YahtzeeBonusRow Bonuses="Score.YahtzeeBonuses"

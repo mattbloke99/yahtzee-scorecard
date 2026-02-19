@@ -16,10 +16,10 @@ public class YahtzeeScore
     public int? Chance { get; set; }
 
     // Lower Section - Fixed Scores
-    public bool? FullHouse { get; set; }
-    public bool? SmallStraight { get; set; }
-    public bool? LargeStraight { get; set; }
-    public bool? Yahtzee { get; set; }
+    public int? FullHouse { get; set; }
+    public int? SmallStraight { get; set; }
+    public int? LargeStraight { get; set; }
+    public int? Yahtzee { get; set; }
 
     // Yahtzee Bonuses (each worth 100)
     public List<bool> YahtzeeBonuses { get; set; } = new();
@@ -31,10 +31,10 @@ public class YahtzeeScore
     public int UpperBonus => UpperTotal >= 63 ? 35 : 0;
 
     public int LowerTotal => (ThreeOfKind ?? 0) + (FourOfKind ?? 0) + (Chance ?? 0) +
-                             (FullHouse == true ? 25 : 0) +
-                             (SmallStraight == true ? 30 : 0) +
-                             (LargeStraight == true ? 40 : 0) +
-                             (Yahtzee == true ? 50 : 0) +
+                             (FullHouse ?? 0) +
+                             (SmallStraight ?? 0) +
+                             (LargeStraight ?? 0) +
+                             (Yahtzee ?? 0) +
                              (YahtzeeBonuses.Count(b => b) * 100);
 
     public int GrandTotal => UpperTotal + UpperBonus + LowerTotal;
